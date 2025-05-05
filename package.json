@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "workspaces": [
-  "apps/web",
-  "apps/api"
-]
+    "apps/web",
+    "apps/api"
+  ],
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  }
 }
