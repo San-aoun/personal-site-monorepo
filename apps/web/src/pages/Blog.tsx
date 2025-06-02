@@ -23,36 +23,37 @@ export default function Blog() {
       .catch(err => console.error(err));
   }, []);
 
-  const mediumPosts: Post[] = [
-    {
-      id: 9999,
-      title: 'Getting Started with UI Automation Testing Using WebdriverIO 8 and Mocha',
-      content: 'In the realm of automated testing, combining WebdriverIO (WDIO) with the Mocha test framework offers a robust solution...',
-      date: 'Apr 16, 2024',
-      views: 6,
-      image: '/images/placeholder.jpg',
-      link: 'https://piyathida-sanaoun01.medium.com/getting-started-with-ui-automation-testing-using-webdriverio-8-and-mocha-45fd190bc90e'
-    }
-  ];
+  // No need for hardcoded mediumPosts
 
-  const allPosts = [...mediumPosts, ...posts];
+  const allPosts = [...posts];
 
-  const handleAddPost = () => {
+  const handleAddPost = async () => {
     if (!link) return;
 
-    const newPost: Post = {
-      id: Date.now(),
-      title: 'New Blog Post', // Placeholder title
-      content: 'Content extracted from the link...', // Placeholder content
+    // Check for duplicate link
+    if (posts.some((post) => post.link === link)) {
+      alert('This blog link already exists.');
+      return;
+    }
+
+    const newPost = {
+      title: 'New Blog Post',
+      content: 'Content extracted from the link...',
       date: new Date().toLocaleDateString(),
       views: 0,
       image: '/images/placeholder.jpg',
       link,
     };
 
-    setPosts([newPost, ...posts]);
-    setLink('');
-  };
+    try {
+      const res = await axios.post('http://localhost:3001/api/posts', newPost);
+      setPosts([res.data, ...posts]);
+      setLink('');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to add blog post');
+    }
+};
 
   const handleEditTitle = (id: number) => {
     const post = posts.find((p) => p.id === id);
@@ -62,18 +63,35 @@ export default function Blog() {
     }
   };
 
-  const handleSaveTitle = (id: number) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === id ? { ...post, title: editedTitle } : post
-      )
-    );
-    setEditingPostId(null);
-    setEditedTitle('');
+  // Edit title and save to database
+  const handleSaveTitle = async (id: number) => {
+    try {
+      const postToUpdate = posts.find((p) => p.id === id);
+      if (!postToUpdate) return;
+      const updatedPost = { ...postToUpdate, title: editedTitle };
+      await axios.put(`http://localhost:3001/api/posts/${id}`, updatedPost);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === id ? { ...post, title: editedTitle } : post
+        )
+      );
+      setEditingPostId(null);
+      setEditedTitle('');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update blog post');
+    }
   };
 
-  const handleDeletePost = (id: number) => {
-    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+  // Delete post from database
+  const handleDeletePost = async (id: number) => {
+      try {
+        await axios.delete(`http://localhost:3001/api/posts/${id}`);
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
+      } catch (err) {
+        console.error(err);
+        alert('Failed to delete blog post');
+      }
   };
 
   return (
