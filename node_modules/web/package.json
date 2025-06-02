@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://san-aoun.github.io/piyathida-blog-profile",
+  "homepage": "https://san-aoun.github.io/personal-site-monorepo/",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
