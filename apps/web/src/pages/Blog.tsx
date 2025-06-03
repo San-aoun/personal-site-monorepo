@@ -28,21 +28,12 @@ export default function Blog() {
   const allPosts = [...posts];
 
   const handleAddPost = async () => {
-    if (!link) return;
-
-    // Check for duplicate link
-    if (posts.some((post) => post.link === link)) {
-      alert('This blog link already exists.');
-      return;
-    }
-
     const newPost = {
       title: 'New Blog Post',
-      content: 'Content extracted from the link...',
+      content: `Content extracted from the link: ${link}`,
       date: new Date().toLocaleDateString(),
       views: 0,
-      image: '/images/placeholder.jpg',
-      link,
+      link, // Save the blog link
     };
 
     try {
@@ -53,7 +44,7 @@ export default function Blog() {
       console.error(err);
       alert('Failed to add blog post');
     }
-};
+  };
 
   const handleEditTitle = (id: number) => {
     const post = posts.find((p) => p.id === id);
@@ -131,6 +122,7 @@ export default function Blog() {
 
         {/* Display all posts */}
         {allPosts.map((post) => (
+          console.log(post.link),
           <div
             key={post.id}
             style={{
@@ -197,7 +189,25 @@ export default function Blog() {
                       marginBottom: '0.5rem',
                     }}
                   >
-                    {post.title}
+                      <a
+                        href={
+                          post.link
+                            ? /^https?:\/\//i.test(post.link)
+                              ? post.link
+                              : `https://${post.link}`
+                            : '#'
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: '#007BFF',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {post.title}
+                      </a>
+                    
                   </h2>
                   <button
                     onClick={() => handleEditTitle(post.id)}
@@ -240,7 +250,7 @@ export default function Blog() {
               >
                 {post.content.slice(0, 120)}...
               </p>
-              <div
+              {/* <div
                 style={{
                   fontSize: '0.85rem',
                   color: '#888',
@@ -263,7 +273,7 @@ export default function Blog() {
                 }}
             >
                 Click link to visit blog...
-            </a>
+            </a> */}
             </div>
             <div style={{ width: '120px', height: '80px', flexShrink: 0 }}>
             </div>
