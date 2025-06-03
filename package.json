@@ -1,10 +1,13 @@
 {
   "name": "personal-site-monorepo",
   "version": "1.0.0",
+  "homepage": "https://your-username.github.io/your-repo-name",
   "description": "my website",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "echo \"Define your build script here\"",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +20,7 @@
     "date-fns": "^4.1.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.2",
     "gh-pages": "^6.3.0"
   }
 }
