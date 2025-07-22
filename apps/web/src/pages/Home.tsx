@@ -34,19 +34,19 @@ export default function Home() {
             </p>
             <div style={{ marginTop: '2rem', display: 'flex', gap: '1.5rem' }}>
               <a href="https://github.com/San-aoun" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/github.png" alt="GitHub" style={{ width: '60px', height: '60px' }} />
+                <img src="./icons/github.png" alt="GitHub" style={{ width: '60px', height: '60px' }} />
               </a>
               <a href="https://www.linkedin.com/in/piyathida-san-aoun-369994173/" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/linkedin.png" alt="LinkedIn" style={{ width: '60px', height: '60px' }} />
+                <img src="./icons/linkedin.png" alt="LinkedIn" style={{ width: '60px', height: '60px' }} />
               </a>
               <a href="https://piyathida-sanaoun01.medium.com/" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/medium.png" alt="Medium" style={{ width: '60px', height: '60px' }} />
+                <img src="./icons/medium.png" alt="Medium" style={{ width: '60px', height: '60px' }} />
               </a>
             </div>
           </div>
           <div style={{ flex: '1 1 35%', textAlign: 'center' }}>
             <img
-              src="/images/profile.jpg"
+              src="./images/profile.jpg"
               alt="Piyathida San-aoun"
               style={{ width: '250px', borderRadius: '1rem', objectFit: 'cover', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
             />
