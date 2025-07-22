@@ -16,31 +16,37 @@ This repository contains the source code for my personal website. It is a monore
 
 ## How to Run the Project
 
-1. **Clone the Repository**:
-     ```bash
-     git clone https://github.com/your-username/personal-site-monorepo.git
-     cd personal-site-monorepo
-     ```
+1. Install dependencies for all workspaces
+From the root of your project:
 
-2. **Install Dependencies**:
-     ```bash
-     npm install
-     ```
+npm install
 
-3. **Run the Development Environment**:
-     ```bash
-     npm run dev
-     ```
+2. Start the backend (API)
+Open a terminal and run:
 
-4. **Build for Production**:
-     ```bash
-     npm run build
-     ```
+cd apps/api
+npm install
+npm run dev
 
-5. **Start the Production Server**:
-     ```bash
-     npm start
-     ```
+(or use the correct script to start your Express server, e.g. npm start or node src/index.js)
+
+3. Start the frontend (web)
+Open another terminal and run:
+
+cd apps/web
+npm install
+npm run dev
+
+This will start your Vite/React app.
+
+4. Access your site
+Frontend: http://localhost:5173 (or the port Vite shows)
+API: http://localhost:3001 (or your Express port)
+Note:
+
+For static-only sites, you only need to run the frontend.
+For dynamic/API features, both frontend and backend must be running.
+Let me know if you need help with deployment or production setup!
 
 ## Contributing
 
