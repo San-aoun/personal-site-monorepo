@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 
 interface Post {
   id: number;
@@ -11,39 +10,54 @@ interface Post {
   link?: string;
 }
 
+// Static Data แทน API
+const initialPosts: Post[] = [
+  {
+    id: 1,
+    title: "Getting Started with React Automation Testing",
+    content: "A comprehensive guide to setting up automation testing frameworks for React applications. Learn about Jest, Testing Library, and best practices for writing maintainable tests.",
+    date: "2024-01-15",
+    views: 120,
+    link: "https://piyathida-sanaoun01.medium.com/react-automation-testing-guide"
+  },
+  {
+    id: 2,
+    title: "CI/CD Pipeline Best Practices",
+    content: "Explore the essential strategies for building robust CI/CD pipelines. From automated testing to deployment strategies, this guide covers everything you need to know.",
+    date: "2024-01-10",
+    views: 89,
+    link: "https://piyathida-sanaoun01.medium.com/cicd-best-practices"
+  },
+  {
+    id: 3,
+    title: "Quality Assurance in Agile Development",
+    content: "Understanding the role of QA in modern Agile teams. Learn how to integrate quality practices throughout the development lifecycle.",
+    date: "2024-01-05",
+    views: 156,
+    link: "https://piyathida-sanaoun01.medium.com/qa-agile-development"
+  }
+];
+
 export default function Blog() {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
   const [link, setLink] = useState<string>('');
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [editedTitle, setEditedTitle] = useState<string>('');
 
-  useEffect(() => {
-    axios.get('http://localhost:3001/api/posts')
-      .then(res => setPosts(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  // No need for hardcoded mediumPosts
-
   const allPosts = [...posts];
 
-  const handleAddPost = async () => {
-    const newPost = {
+  const handleAddPost = () => {
+    const newPost: Post = {
+      id: Math.max(...posts.map(p => p.id), 0) + 1,
       title: 'New Blog Post',
       content: `Content extracted from the link: ${link}`,
       date: new Date().toLocaleDateString(),
       views: 0,
-      link, // Save the blog link
+      link,
     };
 
-    try {
-      const res = await axios.post('http://localhost:3001/api/posts', newPost);
-      setPosts([res.data, ...posts]);
-      setLink('');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to add blog post');
-    }
+    setPosts([newPost, ...posts]);
+    setLink('');
   };
 
   const handleEditTitle = (id: number) => {
@@ -54,40 +68,27 @@ export default function Blog() {
     }
   };
 
-  // Edit title and save to database
-  const handleSaveTitle = async (id: number) => {
-    try {
-      const postToUpdate = posts.find((p) => p.id === id);
-      if (!postToUpdate) return;
-      const updatedPost = { ...postToUpdate, title: editedTitle };
-      await axios.put(`http://localhost:3001/api/posts/${id}`, updatedPost);
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === id ? { ...post, title: editedTitle } : post
-        )
-      );
-      setEditingPostId(null);
-      setEditedTitle('');
-    } catch (err) {
-      console.error(err);
-      alert('Failed to update blog post');
-    }
+  const handleSaveTitle = (id: number) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === id ? { ...post, title: editedTitle } : post
+      )
+    );
+    setEditingPostId(null);
+    setEditedTitle('');
   };
 
-  // Delete post from database
-  const handleDeletePost = async (id: number) => {
-      try {
-        await axios.delete(`http://localhost:3001/api/posts/${id}`);
-        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
-      } catch (err) {
-        console.error(err);
-        alert('Failed to delete blog post');
-      }
+  const handleDeletePost = (id: number) => {
+    setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id));
   };
 
   return (
     <div style={{ padding: '3rem 1rem', fontFamily: 'sans-serif', backgroundColor: '#fffef8', minHeight: '100vh' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem', textAlign: 'center', color: '#333' }}>
+          My Blog Posts
+        </h1>
+        
         {/* Form to add a new blog post */}
         <div style={{ marginBottom: '2rem' }}>
           <input
@@ -122,7 +123,6 @@ export default function Blog() {
 
         {/* Display all posts */}
         {allPosts.map((post) => (
-          console.log(post.link),
           <div
             key={post.id}
             style={{
@@ -189,25 +189,24 @@ export default function Blog() {
                       marginBottom: '0.5rem',
                     }}
                   >
-                      <a
-                        href={
-                          post.link
-                            ? /^https?:\/\//i.test(post.link)
-                              ? post.link
-                              : `https://${post.link}`
-                            : '#'
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          color: '#007BFF',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {post.title}
-                      </a>
-                    
+                    <a
+                      href={
+                        post.link
+                          ? /^https?:\/\//i.test(post.link)
+                            ? post.link
+                            : `https://${post.link}`
+                          : '#'
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        color: '#007BFF',
+                        textDecoration: 'underline',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {post.title}
+                    </a>
                   </h2>
                   <button
                     onClick={() => handleEditTitle(post.id)}
@@ -219,6 +218,7 @@ export default function Blog() {
                       border: 'none',
                       borderRadius: '0.5rem',
                       cursor: 'pointer',
+                      marginRight: '0.5rem',
                     }}
                   >
                     Edit Title
@@ -226,19 +226,17 @@ export default function Blog() {
                   <button
                     onClick={() => handleDeletePost(post.id)}
                     style={{
-                        marginTop: '1rem',
-                        marginLeft: '1rem',
-                        padding: '0.5rem 1rem',
-                        fontSize: '0.9rem',
-                        backgroundColor: '#dc3545',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '0.5rem',
-                        cursor: 'pointer',
+                      padding: '0.5rem 1rem',
+                      fontSize: '0.9rem',
+                      backgroundColor: '#dc3545',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '0.5rem',
+                      cursor: 'pointer',
                     }}
-                    >
+                  >
                     Delete
-                    </button>
+                  </button>
                 </div>
               )}
               <p
@@ -246,36 +244,37 @@ export default function Blog() {
                   fontSize: '0.95rem',
                   color: '#444',
                   lineHeight: 1.6,
+                  marginTop: '0.5rem',
                 }}
               >
                 {post.content.slice(0, 120)}...
               </p>
-              {/* <div
+              <div
                 style={{
                   fontSize: '0.85rem',
                   color: '#888',
                   marginTop: '0.5rem',
                 }}
               >
-                
+                📅 {post.date} • 👁️ {post.views} views
               </div>
-              <a
-                href={post.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                display: 'inline-block',
-                marginTop: '1rem',
-                fontSize: '0.9rem',
-                color: '#007BFF',
-                textDecoration: 'underline',
-                cursor: 'pointer',
-                }}
-            >
-                Click link to visit blog...
-            </a> */}
             </div>
             <div style={{ width: '120px', height: '80px', flexShrink: 0 }}>
+              <div 
+                style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  backgroundColor: '#f0f0f0', 
+                  borderRadius: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#999',
+                  fontSize: '0.8rem'
+                }}
+              >
+                📝 Blog
+              </div>
             </div>
           </div>
         ))}
