@@ -33,8 +33,14 @@ jobs:
     - name: Build
       run: npm run build --workspace=apps/web
       
-    - name: List build output
-      run: ls -la apps/web/dist/
+    - name: Debug - List dist contents
+      run: |
+        echo "Contents of dist:"
+        ls -la apps/web/dist/
+        echo "Contents of dist/icons (if exists):"
+        ls -la apps/web/dist/icons/ || echo "icons folder not found"
+        echo "Contents of dist/images (if exists):"
+        ls -la apps/web/dist/images/ || echo "images folder not found"
       
     - name: Setup Pages
       uses: actions/configure-pages@v4

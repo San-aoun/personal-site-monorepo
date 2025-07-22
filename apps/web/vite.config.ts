@@ -7,6 +7,6 @@ export default defineConfig({
   base: '/personal-site-monorepo/',
   build: {
     assetsDir: 'assets',
-    copyPublicDir: true  // เพิ่มบรรทัดนี้
+    copyPublicDir: true
   }
 })
