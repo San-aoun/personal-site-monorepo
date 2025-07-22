@@ -5,4 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/personal-site-monorepo/',
+  build: {
+    assetsDir: 'assets',
+    copyPublicDir: true  // เพิ่มบรรทัดนี้
+  }
 })
