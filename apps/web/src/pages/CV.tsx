@@ -2,7 +2,7 @@ export default function CV() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '2rem 0' }}>
       <a
-        href="/Piyathida San-aoun 05252025.pdf"
+        href="/personal-site-monorepo/Piyathida San-aoun 05252025.pdf"
         download
         style={{
           marginBottom: '2rem',
@@ -24,7 +24,7 @@ export default function CV() {
         </button>
       </a>
       <img
-        src="/images/cv1.png"
+        src="/personal-site-monorepo/images/cv1.png"
         alt="CV Page 1"
         style={{
           width: '794px', // A4 width at 96dpi
@@ -35,7 +35,7 @@ export default function CV() {
         }}
       />
       <img
-        src="/images/cv2.png"
+        src="/personal-site-monorepo/images/cv2.png"
         alt="CV Page 2"
         style={{
           width: '794px',
