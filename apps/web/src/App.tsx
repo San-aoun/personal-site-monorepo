@@ -6,7 +6,7 @@ import Admin from './pages/Admin';
 
 function App() {
   return (
-    <Router basename="/personal-site-monorepo">
+    <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<Blog />} />
