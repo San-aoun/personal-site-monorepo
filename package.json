@@ -1,15 +1,14 @@
 {
   "name": "personal-site-monorepo",
   "version": "1.0.0",
-  "homepage": "https://your-username.github.io/your-repo-name",
   "description": "my website",
   "main": "index.js",
   "scripts": {
-    "build": "echo \"Define your build script here\"",
+    "build": "npm run build --workspace=apps/web",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "keywords": [],
+  "keywords": ["personal-site", "monorepo", "website", "web-app", "api"],
   "author": "",
   "license": "ISC",
   "workspaces": [

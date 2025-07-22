@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "title": "My First Blog Post",
+    "content": "This is my first post!",
+    "link": "https://medium.com/your-post"
+  },
+  {
+    "id": 2,
+    "title": "Another Post",
+    "content": "More content here.",
+    "link": "https://dev.to/your-post"
+  }
+]
