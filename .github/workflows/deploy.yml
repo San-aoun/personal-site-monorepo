@@ -1,9 +1,8 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -20,8 +19,11 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
-    - name: Install dependencies
-      run: npm install
+    - name: Install root dependencies
+      run: npm ci
+      
+    - name: Install web dependencies
+      run: npm ci --workspace=apps/web
       
     - name: Build
       run: npm run build --workspace=apps/web

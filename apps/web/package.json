@@ -4,13 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "homepage": "https://san-aoun.github.io/personal-site-monorepo",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+   "scripts": {
+    "build": "npx tsc -b && npx vite build",
+    "dev": "npx vite",
+    "preview": "npx vite preview"
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
