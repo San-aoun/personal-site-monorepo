@@ -33,34 +33,6 @@ jobs:
     - name: Build
       run: npm run build --workspace=apps/web
       
-    - name: Debug - Check source public folder
-      run: |
-        echo "=== SOURCE PUBLIC FOLDER ==="
-        ls -la apps/web/public/
-        echo "=== ICONS IN SOURCE ==="
-        ls -la apps/web/public/icons/ || echo "No icons folder in source"
-        echo "=== IMAGES IN SOURCE ==="
-        ls -la apps/web/public/images/ || echo "No images folder in source"
-        
-    - name: Debug - Check built dist folder
-      run: |
-        echo "=== BUILT DIST FOLDER ==="
-        ls -la apps/web/dist/
-        echo "=== ICONS IN DIST ==="
-        ls -la apps/web/dist/icons/ || echo "No icons folder in dist"
-        echo "=== IMAGES IN DIST ==="
-        ls -la apps/web/dist/images/ || echo "No images folder in dist"
-        
-    - name: Debug - Check index.html content
-      run: |
-        echo "=== INDEX.HTML CONTENT ==="
-        cat apps/web/dist/index.html | grep -E "(icons|images)" || echo "No image references found"
-        
-    - name: Debug - Find all image files
-      run: |
-        echo "=== ALL FILES IN DIST ==="
-        find apps/web/dist/ -type f -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" -o -name "*.gif"
-        
     - name: Setup Pages
       uses: actions/configure-pages@v4
       
