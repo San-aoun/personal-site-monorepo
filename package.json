@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build --workspace=apps/web",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "predeploy": "npm run build --workspace=apps/web",
+    "deploy": "gh-pages -d apps/web/dist"
   },
   "keywords": ["personal-site", "monorepo", "website", "web-app", "api"],
   "author": "",
