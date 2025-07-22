@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Post {
   id: number;
@@ -46,6 +46,23 @@ export default function Blog() {
 
   const allPosts = [...posts];
 
+    // Load posts from localStorage on component mount
+  useEffect(() => {
+    const savedPosts = localStorage.getItem('blogPosts');
+    if (savedPosts) {
+      setPosts(JSON.parse(savedPosts));
+    } else {
+      setPosts(initialPosts); // Use initial data if nothing saved
+    }
+  }, []);
+
+   // Save to localStorage whenever posts change
+  useEffect(() => {
+    if (posts.length > 0) {
+      localStorage.setItem('blogPosts', JSON.stringify(posts));
+    }
+  }, [posts]);
+  
   const handleAddPost = () => {
     const newPost: Post = {
       id: Math.max(...posts.map(p => p.id), 0) + 1,
@@ -90,36 +107,52 @@ export default function Blog() {
         </h1>
         
         {/* Form to add a new blog post */}
-        <div style={{ marginBottom: '2rem' }}>
-          <input
-            type="text"
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            placeholder="Enter blog link"
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              fontSize: '1rem',
-              border: '1px solid #ccc',
-              borderRadius: '0.5rem',
-              marginBottom: '1rem',
-            }}
-          />
-          <button
-            onClick={handleAddPost}
-            style={{
-              padding: '0.75rem 1.5rem',
-              fontSize: '1rem',
-              backgroundColor: '#007BFF',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '0.5rem',
-              cursor: 'pointer',
-            }}
-          >
-            Add Blog
-          </button>
-        </div>
+        <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <input
+          type="text"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder="Enter blog link"
+          style={{
+            flex: 1,
+            padding: '0.75rem',
+            fontSize: '1rem',
+            border: '1px solid #ccc',
+            borderRadius: '0.5rem',
+          }}
+        />
+        <button
+          onClick={handleAddPost}
+          style={{
+            padding: '0.75rem 1.5rem',
+            fontSize: '1rem',
+            backgroundColor: '#007BFF',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+          }}
+        >
+          Add Blog
+        </button>
+        <button
+          onClick={() => {
+            localStorage.removeItem('blogPosts');
+            setPosts(initialPosts);
+          }}
+          style={{
+            padding: '0.75rem 1rem',
+            fontSize: '1rem',
+            backgroundColor: '#dc3545',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.5rem',
+            cursor: 'pointer',
+          }}
+        >
+          Reset
+        </button>
+      </div>
 
         {/* Display all posts */}
         {allPosts.map((post) => (
