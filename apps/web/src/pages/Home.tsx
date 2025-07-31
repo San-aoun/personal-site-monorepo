@@ -11,6 +11,7 @@ export default function Home() {
           <Link to="/" style={{ textDecoration: 'none', color: '#000', fontWeight: '500' }}>Home</Link>
           <Link to="/blog" style={{ textDecoration: 'none', color: '#666' }}>Blog</Link>
           <Link to="/cv" style={{ textDecoration: 'none', color: '#666' }}>CV</Link>
+          <Link to="/automation" style={{ textDecoration: 'none', color: '#666' }}>Automation</Link>
           <Link to="/admin" style={{ textDecoration: 'none', color: '#666' }}>Admin</Link>
         </nav>
       </header>

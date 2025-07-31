@@ -1,0 +1,70 @@
+name: 🧪 Test Coverage Report
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-coverage:
+    name: 📊 Generate Test Coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: './apps/web/package-lock.json'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Run tests with coverage
+        run: npm run test:run -- --coverage --reporter=verbose
+
+      - name: 📊 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ./apps/web/coverage
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: 📈 Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = './apps/web/coverage/coverage-summary.json';
+            
+            if (fs.existsSync(path)) {
+              const coverage = JSON.parse(fs.readFileSync(path, 'utf8'));
+              const { total } = coverage;
+              
+              const comment = `📊 **Test Coverage Report**
+              
+              | Metric | Coverage | Change |
+              |--------|----------|---------|
+              | 🎯 Statements | ${total.statements.pct}% | - |
+              | 🌿 Branches | ${total.branches.pct}% | - |
+              | 🔧 Functions | ${total.functions.pct}% | - |
+              | 📄 Lines | ${total.lines.pct}% | - |
+              
+              Coverage details are available in the workflow artifacts.`;
+              
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }

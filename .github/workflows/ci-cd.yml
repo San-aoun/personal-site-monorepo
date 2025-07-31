@@ -1,0 +1,218 @@
+name: CI/CD Pipeline with Unit Tests and UI Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
+
+jobs:
+  # Job 1: Unit Tests for the web application
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './apps/web/package-lock.json'
+
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+          npm ls --depth=0
+
+      - name: 🔍 Run linting
+        run: npm run lint
+
+      - name: 🧪 Run unit tests
+        run: npm run test:run
+
+      - name: 📊 Generate test coverage (optional)
+        run: npm run test:run -- --coverage
+        continue-on-error: true
+
+      - name: 📤 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: |
+            ./apps/web/coverage/
+            ./apps/web/test-results/
+          retention-days: 7
+
+  # Job 2: Build the application
+  build:
+    name: 🏗️ Build Application
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    defaults:
+      run:
+        working-directory: ./apps/web
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './apps/web/package-lock.json'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build application
+        run: npm run build
+
+      - name: 📤 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-files
+          path: ./apps/web/dist/
+          retention-days: 7
+
+  # Job 3: Deploy to GitHub Pages (only on main branch)
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [unit-tests, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    defaults:
+      run:
+        working-directory: ./apps/web
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './apps/web/package-lock.json'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🏗️ Build and deploy
+        run: npm run deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job 4: Trigger UI Tests in Playwright Repository
+  trigger-ui-tests:
+    name: 🎭 Trigger UI Tests
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: 🎭 Trigger Playwright UI Tests
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          script: |
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner: 'San-aoun',
+              repo: 'ui_playwright_piya_profile',
+              workflow_id: 'ci.yml', // Adjust this to match your Playwright workflow file name
+              ref: 'main',
+              inputs: {
+                triggered_by: 'personal-site-monorepo',
+                commit_sha: '${{ github.sha }}',
+                environment: 'production',
+                test_url: 'https://san-aoun.github.io/personal-site-monorepo'
+              }
+            });
+            
+            console.log('✅ Successfully triggered UI tests');
+            console.log('Response:', response.status);
+
+      - name: 📝 Add deployment comment
+        uses: actions/github-script@v7
+        if: github.event_name == 'push'
+        with:
+          script: |
+            const commit = await github.rest.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha
+            });
+            
+            const message = `🚀 **Deployment Complete!**
+            
+            ✅ Unit tests passed
+            ✅ Build successful  
+            ✅ Deployed to GitHub Pages
+            🎭 UI tests triggered in Playwright repository
+            
+            🔗 **Live Site:** https://san-aoun.github.io/personal-site-monorepo
+            📊 **Commit:** ${context.sha.substring(0, 7)}
+            👤 **Author:** ${commit.data.commit.author.name}`;
+            
+            // Create a commit status
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'success',
+              target_url: 'https://san-aoun.github.io/personal-site-monorepo',
+              description: 'Deployment successful, UI tests triggered',
+              context: 'ci/deployment'
+            });
+
+  # Job 5: Notify on failure
+  notify-failure:
+    name: 📧 Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [unit-tests, build, deploy, trigger-ui-tests]
+    if: failure()
+    
+    steps:
+      - name: 📧 Send failure notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const failedJobs = [];
+            
+            if ('${{ needs.unit-tests.result }}' === 'failure') failedJobs.push('Unit Tests');
+            if ('${{ needs.build.result }}' === 'failure') failedJobs.push('Build');
+            if ('${{ needs.deploy.result }}' === 'failure') failedJobs.push('Deploy');
+            if ('${{ needs.trigger-ui-tests.result }}' === 'failure') failedJobs.push('UI Tests Trigger');
+            
+            const message = `❌ **CI/CD Pipeline Failed**
+            
+            **Failed Jobs:** ${failedJobs.join(', ')}
+            **Branch:** ${context.ref}
+            **Commit:** ${context.sha.substring(0, 7)}
+            **Author:** ${context.actor}
+            
+            Please check the [workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId}) for details.`;
+            
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: 'failure',
+              description: `CI/CD failed: ${failedJobs.join(', ')}`,
+              context: 'ci/pipeline'
+            });
