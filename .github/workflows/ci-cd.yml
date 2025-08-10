@@ -9,7 +9,6 @@ on:
 
 env:
   NODE_VERSION: '18'
-  CACHE_KEY: node-modules-${{ hashFiles('**/package-lock.json') }}
 
 jobs:
   # Job 1: Unit Tests for the web application
@@ -119,66 +118,66 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Job 4: Trigger UI Tests in Playwright Repository
-  trigger-ui-tests:
-    name: 🎭 Trigger UI Tests
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#   trigger-ui-tests:
+#     name: 🎭 Trigger UI Tests
+#     runs-on: ubuntu-latest
+#     needs: deploy
+#     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
-    steps:
-      - name: 🎭 Trigger Playwright UI Tests
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          script: |
-            const response = await github.rest.actions.createWorkflowDispatch({
-              owner: 'San-aoun',
-              repo: 'ui_playwright_piya_profile',
-              workflow_id: 'ci.yml', // Adjust this to match your Playwright workflow file name
-              ref: 'main',
-              inputs: {
-                triggered_by: 'personal-site-monorepo',
-                commit_sha: '${{ github.sha }}',
-                environment: 'production',
-                test_url: 'https://san-aoun.github.io/personal-site-monorepo'
-              }
-            });
+#     steps:
+#       - name: 🎭 Trigger Playwright UI Tests
+#         uses: actions/github-script@v7
+#         with:
+#           github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+#           script: |
+#             const response = await github.rest.actions.createWorkflowDispatch({
+#               owner: 'San-aoun',
+#               repo: 'ui_playwright_piya_profile',
+#               workflow_id: 'ci.yml', // Adjust this to match your Playwright workflow file name
+#               ref: 'main',
+#               inputs: {
+#                 triggered_by: 'personal-site-monorepo',
+#                 commit_sha: '${{ github.sha }}',
+#                 environment: 'production',
+#                 test_url: 'https://san-aoun.github.io/personal-site-monorepo'
+#               }
+#             });
             
-            console.log('✅ Successfully triggered UI tests');
-            console.log('Response:', response.status);
+#             console.log('✅ Successfully triggered UI tests');
+#             console.log('Response:', response.status);
 
-      - name: 📝 Add deployment comment
-        uses: actions/github-script@v7
-        if: github.event_name == 'push'
-        with:
-          script: |
-            const commit = await github.rest.repos.getCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha
-            });
+#       - name: 📝 Add deployment comment
+#         uses: actions/github-script@v7
+#         if: github.event_name == 'push'
+#         with:
+#           script: |
+#             const commit = await github.rest.repos.getCommit({
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               ref: context.sha
+#             });
             
-            const message = `🚀 **Deployment Complete!**
+#             const message = `🚀 **Deployment Complete!**
             
-            ✅ Unit tests passed
-            ✅ Build successful  
-            ✅ Deployed to GitHub Pages
-            🎭 UI tests triggered in Playwright repository
+#             ✅ Unit tests passed
+#             ✅ Build successful  
+#             ✅ Deployed to GitHub Pages
+#             🎭 UI tests triggered in Playwright repository
             
-            🔗 **Live Site:** https://san-aoun.github.io/personal-site-monorepo
-            📊 **Commit:** ${context.sha.substring(0, 7)}
-            👤 **Author:** ${commit.data.commit.author.name}`;
+#             🔗 **Live Site:** https://san-aoun.github.io/personal-site-monorepo
+#             📊 **Commit:** ${context.sha.substring(0, 7)}
+#             👤 **Author:** ${commit.data.commit.author.name}`;
             
-            // Create a commit status
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: context.sha,
-              state: 'success',
-              target_url: 'https://san-aoun.github.io/personal-site-monorepo',
-              description: 'Deployment successful, UI tests triggered',
-              context: 'ci/deployment'
-            });
+#             // Create a commit status
+#             await github.rest.repos.createCommitStatus({
+#               owner: context.repo.owner,
+#               repo: context.repo.repo,
+#               sha: context.sha,
+#               state: 'success',
+#               target_url: 'https://san-aoun.github.io/personal-site-monorepo',
+#               description: 'Deployment successful, UI tests triggered',
+#               context: 'ci/deployment'
+#             });
 
   # Job 5: Notify on failure
   notify-failure:
